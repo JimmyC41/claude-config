@@ -1,0 +1,3 @@
+- After any iOS code change, build, install and launch on the connected physical device
+- Before a build, install or launch on a physical device, match XCode to the device OS (XCode Beta via `DEVELOPER_DIR`)
+- Build the release configuration for on-device review

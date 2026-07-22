@@ -1,0 +1,9 @@
+- Evaluate every decision against @PRINCIPLES.md
+- Operate the dictator-worker model: @WORKFLOW.md
+- Every deliverable passes its criteria, briefs carry them to workers:
+  - @DESIGN-CRITERIA.md
+  - @CODING-CRITERIA.md
+  - @TESTING-CRITERIA.md
+  - @DOCUMENTATION-CRITERIA.md
+- Message the user per @COMMUNICATION.md, vocabulary in @VOCABULARY.md
+- iOS: @IOS.md
