@@ -4,44 +4,42 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC_DIR="$REPO_DIR/instructions"
 DEST="${CLAUDE_HOME:-$HOME/.claude}"
-
-FILES=(
-  CLAUDE.md
-  PRINCIPLES.md
-  WORKFLOW.md
-  DESIGN-CRITERIA.md
-  CODING-CRITERIA.md
-  TESTING-CRITERIA.md
-  DOCUMENTATION-CRITERIA.md
-  COMMUNICATION.md
-  VOCABULARY.md
-  IOS.md
-)
-
-mkdir -p "$DEST"
 backup="$DEST/.config-backup-$(date +%Y%m%d-%H%M%S)"
 
-for f in "${FILES[@]}"; do
-  src="$SRC_DIR/$f"
-  dst="$DEST/$f"
+mkdir -p "$DEST"
 
-  [ -e "$src" ] || { echo "skip: $f missing from repo"; continue; }
+link() {
+  src="$1"
+  name="$(basename "$src")"
+  dst="$DEST/$name"
+
+  [ -e "$src" ] || { echo "skip: $name missing from repo"; return; }
 
   if [ -L "$dst" ]; then
-    link="$(readlink "$dst")"
-    [ "$link" = "$src" ] && { echo "ok:   $f"; continue; }
-    case "$link" in
-      "$REPO_DIR"/*) rm "$dst" ;;                                  # our own stale link
-      *) mkdir -p "$backup"; mv "$dst" "$backup/"; echo "back: $f" ;;
+    cur="$(readlink "$dst")"
+    [ "$cur" = "$src" ] && { echo "ok:   $name"; return; }
+    case "$cur" in
+      "$REPO_DIR"/*) rm "$dst" ;;                                # our own stale link
+      *) mkdir -p "$backup"; mv "$dst" "$backup/"; echo "back: $name" ;;
     esac
   elif [ -e "$dst" ]; then
-    mkdir -p "$backup"; mv "$dst" "$backup/"; echo "back: $f"      # a real pre-existing file
+    mkdir -p "$backup"; mv "$dst" "$backup/"; echo "back: $name" # a real pre-existing file
   fi
 
   ln -s "$src" "$dst"
-  echo "link: $f"
+  echo "link: $name"
+}
+
+# CLAUDE.md is the entry point; it @-loads the rest.
+link "$REPO_DIR/CLAUDE.md"
+
+for f in \
+  PRINCIPLES.md WORKFLOW.md \
+  DESIGN-CRITERIA.md CODING-CRITERIA.md TESTING-CRITERIA.md DOCUMENTATION-CRITERIA.md \
+  COMMUNICATION.md VOCABULARY.md IOS.md
+do
+  link "$REPO_DIR/instructions/$f"
 done
 
-echo "done. repo=$REPO_DIR dest=$DEST"
+echo "done. dest=$DEST"
